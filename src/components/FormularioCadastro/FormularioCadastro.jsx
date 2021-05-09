@@ -1,31 +1,62 @@
-import React from 'react';
-import { TextField, Button, Switch, FormControlLabel } from "@material-ui/core"
+import { StepLabel, Stepper, Typography, Step } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+import DadosEntrega from './DadosEntrega';
+import DadosPessoais from './DadosPessoas';
+import DadosUsuario from './DadosUsuario';
 
-function FormularioCadastro() {
-    let nome = "";
-    state={}
+
+function FormularioCadastro({ onSubmit }) {
+    const [nome, setNome] = useState("Ricardo")
+    const [sobrenome, setSobrenome] = useState("")
+    const [cpf, setCpf] = useState("")
+    const [promocoes, setPromocoes] = useState(true)
+    const [novidades, setNovidades] = useState(true)
+
+    const [erros, setErros] = useState({ cpf: { valido: true, texto: "" } })
+
+    const [etapaAtual, setEtapaAtual] = useState(0)
+
+    const [dadosColetados, setDados] = useState("");
+
+    useEffect(() => {
+        if (etapaAtual == formularios.length - 1) {
+            onSubmit(dadosColetados)
+        }
+        console.log(dadosColetados)
+    })
+
+    const formularios = [<DadosUsuario onSubmit={coletarDados} />,
+    <DadosPessoais onSubmit={coletarDados} />,
+    <DadosEntrega onSubmit={coletarDados} />,
+    <Typography variant="h5">Obrigado por se cadastrar</Typography>]
+
+    function coletarDados(dados) {
+        setDados({ ...dadosColetados, ...dados });
+        proximo()
+    }
+
+    function proximo() {
+        setEtapaAtual(etapaAtual + 1);
+    }
+
+
     return (
-        <form onSubmit={event => {
-            event.preventDefault();
-           console.log(nome)
 
-        }}>
-            <TextField value={nome} id="nome" label="Nome" variant="outlined" margin="normal" fullWidth onChange={event => {
+        <>
+            <Stepper activeStep={etapaAtual}>
+                <Step><StepLabel>Login</StepLabel></Step>
+                <Step><StepLabel>Pessoal</StepLabel></Step>
+                <Step><StepLabel>Entrega</StepLabel></Step>
+                <Step><StepLabel>Finalizaçao</StepLabel></Step>
+            </Stepper>
+            {
+                formularios[etapaAtual]
+            }
 
-                nome = event.target.value;
-            }} />
-
-            <TextField id="sobrenome" label="sobrenome" variant="outlined" margin="normal" fullWidth />
-
-            <TextField id="cpf" label="CPF" variant="outlined" margin="normal" fullWidth />
-            <FormControlLabel label="Promoçoes" control={<Switch name="promocoes" defaultChecked color="primary" />} />
-
-            <FormControlLabel label="Novidades" control={<Switch name="novidades" defaultChecked color="primary" />} />
-
-            <Button type="submit" variant="contained" color="primary">Cadastrar</Button>
-
-        </form>
+        </>
     )
 }
+
+
 
 export default FormularioCadastro;
